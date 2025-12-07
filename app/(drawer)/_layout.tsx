@@ -7,35 +7,28 @@ export default function Layout() {
         name="map"
         options={{
           drawerLabel: 'Map',
-          title: 'maps',
-        }}
-      />
-      <Drawer.Screen
-        name="history"
-        options={{
-          drawerLabel: 'History',
-          title: 'history',
+          title: 'Map',
         }}
       />
        <Drawer.Screen
         name="alerts"
         options={{
           drawerLabel: 'Alerts',
-          title: 'alerts',
+          title: 'Alerts',
         }}
       />
       <Drawer.Screen
         name="profile"
         options={{
           drawerLabel: 'Profile',
-          title: 'profile',
+          title: 'Profile',
         }}
       />
       <Drawer.Screen
         name="settings"
         options={{
           drawerLabel: 'Settings',
-          title: 'settings',
+          title: 'Settings',
         }}
       />
     </Drawer>
