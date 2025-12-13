@@ -51,3 +51,17 @@ export const ALERT_CONFIG: Record<AlertType, AlertUIConfig> = {
         color: "#1976d2",
     },
 };
+
+export interface Alert {
+    id: string;
+    type: AlertType;
+    description: string;
+    time: string;
+    location: string;
+}
+
+export interface AlertsState {
+    alerts: Alert[];
+    addAlert: (alert: Alert) => Promise<void>;
+    loadAlerts: () => Promise<void>;
+}
