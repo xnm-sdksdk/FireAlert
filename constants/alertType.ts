@@ -61,7 +61,9 @@ export interface Alert {
 }
 
 export interface AlertsState {
-    alerts: Alert[];
-    addAlert: (alert: Alert) => Promise<void>;
-    loadAlerts: () => Promise<void>;
+    alerts: CardProps[];
+    addAlert: (alert: CardProps) => void;
+    loadAlerts: () => void;
+    removeAlert: (index: number) => void;
+
 }

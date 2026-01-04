@@ -1,8 +1,79 @@
-// import { GoogleMaps } from "expo-maps";
-// import { Platform } from "react-native";
+import MapView, { Marker } from "react-native-maps";
+import React, { useEffect, useState } from "react";
+import {
+  PermissionsAndroid,
+  View,
+  TouchableOpacity,
+  Text,
+  Alert,
+} from "react-native";
+import * as Location from "expo-location";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
-// export default function Map() {
-//   if (Platform.OS === "android") {
-//     return <GoogleMaps.View style={{ flex: 1 }} />;
-//   }
-// }
+const Map = () => {
+  const [mLat, setMLat] = useState(0);
+  const [mLong, setMLong] = useState(0);
+
+  useEffect(() => {
+    requestLocationPermission();
+  }, []);
+
+  const requestLocationPermission = async () => {
+    try {
+      const hasPermission = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+      );
+      if (!hasPermission) {
+        console.log("No location permission");
+        return;
+      }
+      const permission = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: "Location Permission",
+          message: "FireAlert needs access to your location",
+          buttonNegative: "Cancel",
+          buttonPositive: "OK",
+        }
+      );
+      if (permission === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log("You can use the location");
+        return permission === PermissionsAndroid.RESULTS.GRANTED;
+      } else {
+        console.log("Location permission denied");
+        return permission === PermissionsAndroid.RESULTS.DENIED;
+      }
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  };
+
+  const getLocation = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission denied");
+      return;
+    }
+
+    const loc = await Location.getCurrentPositionAsync({});
+    setMLat(loc.coords.latitude);
+    setMLong(loc.coords.longitude);
+  };
+
+  return (
+    <View style={{ flex: 1 }}>
+      <MapView style={{ flex: 1 }}>
+        <Marker coordinate={{ latitude: mLat, longitude: mLong }} />
+      </MapView>
+      <TouchableOpacity
+        style={{ position: "absolute", bottom: 20, right: 20 }}
+        onPress={getLocation}
+      >
+        <MaterialIcons name="my-location" size={32} color="white" />
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+export default Map;

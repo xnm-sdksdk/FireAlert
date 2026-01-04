@@ -1,32 +1,20 @@
 import Card from "@/components/ui/Card";
-import { AlertType, CardProps } from "@/constants/alertType";
-import React from "react";
+import { alertStore } from "@/store/alert.store";
+import React, { useEffect } from "react";
 import { ScrollView } from "react-native";
 
 export default function Alerts() {
-  const alerts: CardProps[] = [
-    {
-      type: AlertType.Critical,
-      title: "Fire near forest",
-      description: "Location: North Park",
-      time: "2",
-      location: "3.2",
-    },
-    {
-      type: AlertType.Medium,
-      title: "Smoke detected",
-      description: "Location: Downtown",
-      time: "2",
-      location: "3.2",
-    },
-    {
-      type: AlertType.Contained,
-      title: "Cleared area",
-      description: "No danger now",
-      time: "2",
-      location: "3.2",
-    },
-  ];
+  const alerts = alertStore((state) => state.alerts);
+  const addAlert = alertStore((state) => state.addAlert);
+  const removeAlert = alertStore((state) => state.removeAlert);
+  const loadAlerts = alertStore((state) => state.loadAlerts);
+
+
+  useEffect(() => {
+    loadAlerts();
+  }, []);
+  
+  if (!alerts || alerts.length === 0) return null;
 
   return (
     <ScrollView style={{ flex: 1, padding: 10 }}>
