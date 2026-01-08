@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Entypo from "@expo/vector-icons/Entypo";
 
 const Map = () => {
   const [mLat, setMLat] = useState(0);
@@ -16,6 +17,9 @@ const Map = () => {
   useEffect(() => {
     requestLocationPermission();
   }, []);
+
+  const [zoom, setZoom] = useState(15);
+  const handleView = (isZoomIn = false) => {};
 
   const requestLocationPermission = async () => {
     try {
@@ -62,14 +66,29 @@ const Map = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <MapView style={{ flex: 1 }}>
+      <MapView style={{ flex: 1 }} mapType="hybrid">
         <Marker coordinate={{ latitude: mLat, longitude: mLong }} />
       </MapView>
+
       <TouchableOpacity
-        style={{ position: "absolute", bottom: 20, right: 20 }}
+        style={{ position: "absolute", bottom: 100, left: 20 }}
+        onPress={() => handleView(true)}
+      >
+        <MaterialIcons name="add-box" size={32} color="lightgrey" />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={{ position: "absolute", bottom: 65, left: 20 }}
+        onPress={() => handleView(true)}
+      >
+        <Entypo name="squared-minus" size={32} color="lightgrey" />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={{ position: "absolute", bottom: 65, right: 20 }}
         onPress={getLocation}
       >
-        <MaterialIcons name="my-location" size={32} color="white" />
+        <MaterialIcons name="my-location" size={32} color="lightgrey" />
       </TouchableOpacity>
     </View>
   );
