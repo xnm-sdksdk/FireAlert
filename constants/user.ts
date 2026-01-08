@@ -1,12 +1,13 @@
 export interface User {
-    id: string;
-    name: string;
-    email: string;
+    username: string;
+    password: string;
 }
 
 export interface AuthState {
+    users: User[];
     user: User | null;
-    signIn: (user: User) => Promise<void>;
-    signOut: () => Promise<void>;
-    loadUser: () => Promise<void>;
+    register: (username: string, password: string) => Promise<boolean>;
+    signIn: (username: string, password: string) => Promise<boolean>;
+    signOut: () => void;
+    loadUser: () => void;
 }
