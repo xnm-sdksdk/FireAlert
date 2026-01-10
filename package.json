@@ -34,6 +34,7 @@
     "expo-symbols": "~1.0.7",
     "expo-system-ui": "~6.0.8",
     "expo-web-browser": "~15.0.9",
+    "formik": "^2.4.9",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.68.0",
@@ -47,6 +48,7 @@
     "react-native-vector-icons": "^10.3.0",
     "react-native-web": "~0.21.0",
     "react-native-worklets": "0.5.1",
+    "yup": "^1.7.1",
     "zustand": "^5.0.9"
   },
   "devDependencies": {

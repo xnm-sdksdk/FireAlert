@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Text,
 } from "react-native";
-import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import authStore from "../../store/auth.store";
 
 const Profile = () => {
@@ -17,14 +17,15 @@ const Profile = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const submitData = (data) => {
+  const submitData = (data: string) => {
     console.log(data);
   };
-  const editData = (data) => {
+  const editData = (data: string) => {
     console.log(data);
   };
-  const [username, onChangeText] = React.useState("Useless Text");
-  const [password, onChangeNumber] = React.useState("");
+
+  const [username, onChangeText] = useState("");
+  const [password, onChangeNumber] = useState("");
 
   const store = useRef(authStore.getState()).current;
   const { loadUser } = store;
@@ -60,13 +61,13 @@ const Profile = () => {
           style={styles.button}
           onPress={handleSubmit(editData)}
         >
-          <Text>Edit</Text>
+          <Text style={styles.buttonText}>Edit</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.button}
           onPress={handleSubmit(submitData)}
         >
-          <Text>Submit</Text>
+          <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity>
       </SafeAreaView>
     </View>
@@ -76,30 +77,48 @@ const Profile = () => {
 export default Profile;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 20 },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingHorizontal: 20,
+    paddingTop: 60,
+  },
   header: {
-    fontSize: 20,
-    marginTop: 0,
-    textAlign: "center",
+    fontSize: 24,
     fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 40,
+  },
+  inputContainer: {
+    flex: 1,
+    justifyContent: "center",
   },
   input: {
-    height: 40,
-    margin: 12,
     borderWidth: 1,
-    padding: 10,
-    borderRadius: 18,
-  },
-  button: {
-    alignItems: "center",
-    backgroundColor: "#DDDDDD",
-    padding: 10,
-    width: 150,
-    borderRadius: 18,
-    margin: 10,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 14,
+    marginBottom: 20,
+    fontSize: 16,
+    backgroundColor: "#f9f9f9",
   },
   buttonRow: {
     flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: -40,
+  },
+  button: {
+    flex: 1,
     alignItems: "center",
+    backgroundColor: "#FF4500",
+    paddingVertical: 14,
+    borderRadius: 8,
+    marginHorizontal: 5,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
