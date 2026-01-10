@@ -1,5 +1,6 @@
 import { AuthState } from "@/constants/user";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
 import { create } from "zustand";
 
 const authStore = create<AuthState>((set, get) => ({
@@ -46,6 +47,7 @@ const authStore = create<AuthState>((set, get) => ({
     signOut: async () => {
         set({ user: null });
         await AsyncStorage.removeItem("currentUser");
+        router.replace("/auth");
     },
 }));
 

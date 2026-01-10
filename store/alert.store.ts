@@ -42,11 +42,26 @@ const alertStore = create<AlertsState>((set, get) => ({
 
     loadAlerts: async () => {
         const stored = await AsyncStorage.getItem("alerts");
-        if (stored) {
-            set({ alerts: JSON.parse(stored) });
-        } else {
-            await AsyncStorage.setItem("alerts", JSON.stringify(get().alerts));
+
+        if (stored === null) {
+            // First app launch → seed storage
+            const initial = get().alerts;
+            await AsyncStorage.setItem("alerts", JSON.stringify(initial));
+            set({ alerts: initial });
+            return;
         }
+
+        const parsed = JSON.parse(stored);
+
+        // Guard against corrupted / empty data
+        if (!Array.isArray(parsed)) {
+            const fallback = get().alerts;
+            await AsyncStorage.setItem("alerts", JSON.stringify(fallback));
+            set({ alerts: fallback });
+            return;
+        }
+
+        set({ alerts: parsed });
     },
 }));
 

@@ -56,7 +56,7 @@ export type Alert = {
     id: string;
     type: AlertType;
     description: string;
-    time: string;
+    time: Date;
     location: string;
 };
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   Button,
@@ -9,6 +9,7 @@ import {
   Text,
 } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+import authStore from "../../store/auth.store";
 
 const Profile = () => {
   const {
@@ -22,27 +23,30 @@ const Profile = () => {
   const editData = (data) => {
     console.log(data);
   };
-  const [text, onChangeText] = React.useState("Useless Text");
-  const [number, onChangeNumber] = React.useState("");
+  const [username, onChangeText] = React.useState("Useless Text");
+  const [password, onChangeNumber] = React.useState("");
+
+  const store = useRef(authStore.getState()).current;
+  const { loadUser } = store;
 
   return (
-    <View>
-      <SafeAreaProvider>
-        <SafeAreaView>
-          <TextInput
-            style={styles.input}
-            onChangeText={onChangeText}
-            value={text}
-          />
-          <TextInput
-            style={styles.input}
-            onChangeText={onChangeNumber}
-            value={number}
-            placeholder="useless placeholder"
-            keyboardType="numeric"
-          />
-        </SafeAreaView>
-      </SafeAreaProvider>
+    <View style={styles.container}>
+      <Text style={styles.header}>
+        Welcome to your profile {store.user?.username}
+      </Text>
+      <TextInput
+        placeholder="Change Username"
+        style={styles.input}
+        onChangeText={onChangeText}
+        value={username}
+      />
+      <TextInput
+        placeholder="Change Password"
+        style={styles.input}
+        onChangeText={onChangeNumber}
+        secureTextEntry
+        value={password}
+      />
       <Controller
         control={control}
         name="username"
@@ -69,7 +73,16 @@ const Profile = () => {
   );
 };
 
+export default Profile;
+
 const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: "center", padding: 20 },
+  header: {
+    fontSize: 20,
+    marginTop: 0,
+    textAlign: "center",
+    fontWeight: "bold",
+  },
   input: {
     height: 40,
     margin: 12,
@@ -86,9 +99,7 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   buttonRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  }
+    flexDirection: "row",
+    alignItems: "center",
+  },
 });
-
-export default Profile;

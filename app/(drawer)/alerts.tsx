@@ -28,9 +28,9 @@ const Alerts = () => {
     });
   };
 
-  if (alerts.length === 0) {
-    return <Text>No alerts at the moment!</Text>;
-  }
+  // if (alerts.length === 0) {
+  //   return <Text>No alerts at the moment!</Text>;
+  // }
 
   return (
     <SafeAreaView style={{ flex: 1, padding: 16 }}>
