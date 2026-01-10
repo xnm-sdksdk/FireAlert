@@ -5,21 +5,21 @@ export enum AlertType {
     Warning = "Fire Warning",
     Contained = "Fire Contained",
     Extinguished = "Fire Extinguished",
-    NewFire = "New Fire Detected"
+    NewFire = "New Fire Detected",
 }
 
-export interface CardProps {
-    title: string,
+export type CardProps = {
+    title: string;
     type: AlertType;
     description: string;
     time: string;
     location: string;
-}
+};
 
-export interface AlertUIConfig {
+export type AlertUIConfig = {
     icon: string;
     color: string;
-}
+};
 
 export const ALERT_CONFIG: Record<AlertType, AlertUIConfig> = {
     [AlertType.Critical]: {
@@ -52,18 +52,17 @@ export const ALERT_CONFIG: Record<AlertType, AlertUIConfig> = {
     },
 };
 
-export interface Alert {
+export type Alert = {
     id: string;
     type: AlertType;
     description: string;
     time: string;
     location: string;
-}
+};
 
-export interface AlertsState {
+export type AlertsState = {
     alerts: CardProps[];
-    addAlert: (alert: CardProps) => void;
-    loadAlerts: () => void;
-    removeAlert: (index: number) => void;
-
-}
+    addAlert: (alert: CardProps) => Promise<void>;
+    loadAlerts: () => Promise<void>;
+    removeAlert: (index: number) => Promise<void>;
+};

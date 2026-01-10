@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   View,
   TextInput,
@@ -8,20 +8,18 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import { authStore } from "../store/auth.store";
+import authStore from "../store/auth.store";
 
 const Auth = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isSignIn, setIsSignIn] = useState(true);
 
-  const signIn = authStore((state) => state.signIn);
-  const signOut = authStore((state) => state.signOut);
-  const loadUser = authStore((state) => state.loadUser);
-  const register = authStore((state) => state.register);
+  const store = useRef(authStore.getState()).current;
+  const { signIn, register, loadUser } = store;
 
   useEffect(() => {
-    loadUser();
+    authStore.getState().loadUser();
   }, []);
 
   const handleSignIn = async () => {
@@ -29,11 +27,16 @@ const Auth = () => {
 
     if (isSignIn) {
       const successSignIn = await signIn(username, password);
-      if (!successSignIn) return Alert.alert("Error", "Invalid Credentials.");
+      if (!successSignIn) {
+        return Alert.alert("Error", "Invalid Credentials.");
+      }
+      console.log(`User ${username} signedIn in the app.`);
     } else {
       const successRegister = await register(username, password);
-      if (!successRegister)
+      if (!successRegister) {
         return Alert.alert("Error", "Username already exists.");
+      }
+      console.log(`User ${username} registered in the app.`);
     }
 
     router.replace("/(drawer)/map");

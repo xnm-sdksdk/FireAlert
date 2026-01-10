@@ -2,9 +2,14 @@ import { AuthState } from "@/constants/user";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 
-export const authStore = create<AuthState>((set, get) => ({
+const authStore = create<AuthState>((set, get) => ({
     user: null,
-    users: [],
+    users: [
+        {
+            username: "nuno",
+            password: "1234",
+        },
+    ],
 
     loadUser: async () => {
         const storedUsers = await AsyncStorage.getItem("users");
@@ -16,20 +21,21 @@ export const authStore = create<AuthState>((set, get) => ({
     register: async (username, password) => {
         const { users } = get();
 
-        if (users.find(u => u.username === username)) return false;
+        if (users.find((u) => u.username === username)) return false;
 
         const newUser = { username, password };
         const newUsers = [...users, newUser];
 
         await AsyncStorage.setItem("users", JSON.stringify(newUsers));
         set({ users: newUsers, user: newUser });
-        await AsyncStorage.setItem("currentUser", JSON.stringify(newUser));
         return true;
     },
 
     signIn: async (username, password) => {
         const { users } = get();
-        const user = users.find(u => u.username === username && u.password === password);
+        const user = users.find(
+            (u) => u.username === username && u.password === password
+        );
         if (!user) return false;
 
         set({ user: user });
@@ -42,3 +48,5 @@ export const authStore = create<AuthState>((set, get) => ({
         await AsyncStorage.removeItem("currentUser");
     },
 }));
+
+export default authStore;

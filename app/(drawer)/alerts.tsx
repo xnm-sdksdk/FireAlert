@@ -1,20 +1,25 @@
 import Card from "@/components/ui/Card";
 import { AlertType } from "@/constants/alertType";
-import { alertStore } from "@/store/alert.store";
-import React, { useEffect } from "react";
-import { ScrollView, TouchableOpacity, Text } from "react-native";
-import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+import alertStore from "@/store/alert.store";
+import React, { useEffect, useRef, useState } from "react";
+import { ScrollView, TouchableOpacity, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
-export default function Alerts() {
-   const { alerts, addAlert, loadAlerts } = alertStore();
+const Alerts = () => {
+  const [alerts, setAlerts] = useState(alertStore.getState().alerts);
 
   useEffect(() => {
-    loadAlerts();
+    const unsub = alertStore.subscribe((state) => {
+      setAlerts(state.alerts);
+    });
+    alertStore.getState().loadAlerts();
+
+    return () => unsub();
   }, []);
 
   const handleAddAlert = () => {
-    addAlert({
+    alertStore.getState().addAlert({
       type: AlertType.Medium,
       title: "Test Alert",
       description: "This is a mock alert",
@@ -28,9 +33,17 @@ export default function Alerts() {
   }
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView edges={["top"]}>
-        <ScrollView style={{ flex: 1, height: 100 }}>
+    <SafeAreaView style={{ flex: 1, padding: 16 }}>
+      {alerts.length === 0 && (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Text>No alerts at the moment!</Text>
+        </View>
+      )}
+
+      {alerts.length > 0 && (
+        <ScrollView style={{ flex: 1 }}>
           {alerts.map((alert, index) => (
             <Card
               key={index}
@@ -42,13 +55,16 @@ export default function Alerts() {
             />
           ))}
         </ScrollView>
-      </SafeAreaView>
+      )}
+
       <TouchableOpacity
         style={{ position: "absolute", bottom: 20, right: 20 }}
         onPress={handleAddAlert}
       >
         <MaterialIcons name="add-circle" size={60} color="darkgrey" />
       </TouchableOpacity>
-    </SafeAreaProvider>
+    </SafeAreaView>
   );
-}
+};
+
+export default Alerts;

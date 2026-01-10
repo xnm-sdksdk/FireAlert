@@ -2,7 +2,7 @@ import { AlertsState, AlertType } from "@/constants/alertType";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 
-export const alertStore = create<AlertsState>((set, get) => ({
+const alertStore = create<AlertsState>((set, get) => ({
     alerts: [
         {
             type: AlertType.Critical,
@@ -49,3 +49,5 @@ export const alertStore = create<AlertsState>((set, get) => ({
         }
     },
 }));
+
+export default alertStore;
