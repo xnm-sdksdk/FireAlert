@@ -20,10 +20,11 @@ const Alerts = () => {
 
   const handleAddAlert = () => {
     alertStore.getState().addAlert({
+      id: Date.now(),
       type: AlertType.Medium,
       title: "Test Alert",
       description: "This is a mock alert",
-      time: new Date().toISOString(),
+      time: Date.now(),
       location: "Lisbon",
     });
   };
@@ -44,9 +45,10 @@ const Alerts = () => {
 
       {alerts.length > 0 && (
         <ScrollView style={{ flex: 1 }}>
-          {alerts.map((alert, index) => (
+          {alerts.map((alert) => (
             <Card
-              key={index}
+              key={alert.id}
+              id={alert.id}
               type={alert.type}
               title={alert.title}
               description={alert.description}

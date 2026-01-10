@@ -3,8 +3,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 
 const alertStore = create<AlertsState>((set, get) => ({
+    alert: null,
     alerts: [
         {
+            id: 1,
             type: AlertType.Critical,
             title: "Fire near forest",
             description: "Location: North Park",
@@ -12,6 +14,7 @@ const alertStore = create<AlertsState>((set, get) => ({
             location: "3.2 km",
         },
         {
+            id: 2,
             type: AlertType.Medium,
             title: "Smoke detected",
             description: "Location: Downtown",
@@ -19,6 +22,7 @@ const alertStore = create<AlertsState>((set, get) => ({
             location: "1.1 km",
         },
         {
+            id: 3,
             type: AlertType.Contained,
             title: "Cleared area",
             description: "No danger now",
@@ -28,23 +32,24 @@ const alertStore = create<AlertsState>((set, get) => ({
     ],
 
     addAlert: async (alert) => {
+        const newAlert = {
+            ...alert, id: Date.now()
+        }
         const updated = [alert, ...get().alerts];
         set({ alerts: updated });
         await AsyncStorage.setItem("alerts", JSON.stringify(updated));
     },
 
-    removeAlert: async (index) => {
-        const updated = [...get().alerts];
-        updated.splice(index, 1);
+    removeAlert: async (id: number) => {
+        const updated = get().alerts.filter((alert) => alert.id !== id);
         set({ alerts: updated });
-        AsyncStorage.setItem("alerts", JSON.stringify(updated));
+        await AsyncStorage.setItem("alerts", JSON.stringify(updated));
     },
 
     loadAlerts: async () => {
         const stored = await AsyncStorage.getItem("alerts");
 
         if (stored === null) {
-            // First app launch → seed storage
             const initial = get().alerts;
             await AsyncStorage.setItem("alerts", JSON.stringify(initial));
             set({ alerts: initial });
@@ -52,8 +57,6 @@ const alertStore = create<AlertsState>((set, get) => ({
         }
 
         const parsed = JSON.parse(stored);
-
-        // Guard against corrupted / empty data
         if (!Array.isArray(parsed)) {
             const fallback = get().alerts;
             await AsyncStorage.setItem("alerts", JSON.stringify(fallback));
