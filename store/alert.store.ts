@@ -10,7 +10,7 @@ const alertStore = create<AlertsState>((set, get) => ({
             type: AlertType.Critical,
             title: "Fire near forest",
             description: "Location: North Park",
-            time: "2 min ago",
+            time: Date.now().toLocaleString(),
             location: "3.2 km",
         },
         {

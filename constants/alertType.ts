@@ -53,13 +53,20 @@ export const ALERT_CONFIG: Record<AlertType, AlertUIConfig> = {
     },
 };
 
+export type AlertImage = {
+    width?: number;
+    height?: number;
+};
+
 export type Alert = {
     id: number;
     title: string;
     type: AlertType;
+    severity: AlertType;
     description: string;
     time: Date;
     location: string;
+    image?: AlertImage;
 };
 
 export type AlertsState = {
