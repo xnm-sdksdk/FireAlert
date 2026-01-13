@@ -1,16 +1,11 @@
-import { AuthState } from "@/constants/user";
+import { AuthState, User } from "@/constants/user";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { create } from "zustand";
 
 const authStore = create<AuthState>((set, get) => ({
     user: null,
-    users: [
-        {
-            username: "nuno",
-            password: "1234",
-        },
-    ],
+    users: [],
 
     loadUser: async () => {
         const storedUsers = await AsyncStorage.getItem("users");
@@ -24,7 +19,12 @@ const authStore = create<AuthState>((set, get) => ({
 
         if (users.find((u) => u.username === username)) return false;
 
-        const newUser = { username, password };
+        const newUser: User = {
+            ...users,
+            id: Date.now(),
+            username,
+            password,
+        };
         const newUsers = [...users, newUser];
 
         await AsyncStorage.setItem("users", JSON.stringify(newUsers));

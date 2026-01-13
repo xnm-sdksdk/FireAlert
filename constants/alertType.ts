@@ -10,7 +10,6 @@ export enum AlertType {
 
 export type CardProps = {
     id: number;
-    title: string;
     type: AlertType;
     description: string;
     time: Date;
@@ -53,14 +52,17 @@ export const ALERT_CONFIG: Record<AlertType, AlertUIConfig> = {
     },
 };
 
+export type NewAlert = Omit<AlertI, "id" | "time">;
+
 export type AlertImage = {
+    uri: string;
     width?: number;
     height?: number;
 };
 
-export type Alert = {
+export type AlertI = {
     id: number;
-    title: string;
+    userId: number;
     type: AlertType;
     severity: AlertType;
     description: string;
@@ -70,9 +72,9 @@ export type Alert = {
 };
 
 export type AlertsState = {
-    alert: Alert | null;
-    alerts: Alert[];
-    addAlert: (alert: CardProps) => Promise<void>;
+    alert: AlertI | null;
+    alerts: AlertI[];
+    addAlert: (alert: NewAlert) => Promise<void>;
     loadAlerts: () => Promise<void>;
     removeAlert: (index: number) => Promise<void>;
 };

@@ -1,17 +1,15 @@
 import { ALERT_CONFIG, CardProps } from "@/constants/alertType";
-// import FontAwesome from "react-native-vector-icons/FontAwesome";
 import React, { useRef } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Image } from "react-native";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import alertStore from "../../store/alert.store";
 
 export default function Card({
   id,
-  title,
   description,
   type,
   time,
-  location,
+  location
 }: CardProps) {
   const config = ALERT_CONFIG[type];
 
@@ -23,17 +21,14 @@ export default function Card({
       <View style={styles.header}>
         <Text style={[styles.title, { color: config.color }]}>{type}</Text>
         <EvilIcons
-          style={styles.trashIcon}
           name="trash"
           size={32}
           color="red"
           onPress={() => removeAlert(id)}
         />
       </View>
-
-      <Text>{title}</Text>
-      <Text style={styles.description}>{description}</Text>
-      <Text style={styles.time}>{time.toString()}</Text>
+      <Text style={styles.description}>{description || "No description"}</Text>
+      <Text style={styles.time}>{time.toString().slice(0, 25)}</Text>
       <Text style={styles.location}>{location}</Text>
     </View>
   );
@@ -51,16 +46,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 8,
-  },
-  icon: {
-    marginRight: 8,
+    justifyContent: "space-between",
   },
   title: {
     fontSize: 18,
     fontWeight: "600",
   },
   description: {
+    fontSize: 14,
+    color: "#333",
     marginVertical: 4,
+    flexShrink: 1,
   },
   time: {
     fontSize: 12,
@@ -70,8 +66,7 @@ const styles = StyleSheet.create({
   location: {
     fontSize: 12,
     color: "#555",
-  },
-  trashIcon: {
-    left: 110,
+    marginVertical: 4,
+    flexShrink: 1,
   },
 });

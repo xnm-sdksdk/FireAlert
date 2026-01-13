@@ -1,7 +1,8 @@
 export type User = {
+    id: number;
     username: string;
     password: string;
-}
+};
 
 export type AuthState = {
     users: User[];
@@ -10,4 +11,4 @@ export type AuthState = {
     signIn: (username: string, password: string) => Promise<boolean>;
     signOut: () => Promise<void>;
     loadUser: () => Promise<void>;
-}
+};

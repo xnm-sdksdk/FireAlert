@@ -39,14 +39,14 @@ const Profile = () => {
         placeholder="Change Username"
         style={styles.input}
         onChangeText={onChangeText}
-        value={username}
+        value={store.user?.username}
       />
       <TextInput
         placeholder="Change Password"
         style={styles.input}
         onChangeText={onChangeNumber}
         secureTextEntry
-        value={password}
+        value={store.user?.password}
       />
       <Controller
         control={control}

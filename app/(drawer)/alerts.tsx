@@ -1,5 +1,5 @@
 import Card from "@/components/ui/Card";
-import { ALERT_CONFIG, AlertType } from "@/constants/alertType";
+import { AlertType, AlertI } from "@/constants/alertType";
 import alertStore from "@/store/alert.store";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -11,28 +11,42 @@ import {
   TextInput,
   StyleSheet,
   Alert,
+  StatusBar,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import authStore from "@/store/auth.store";
+import * as Location from "expo-location";
 
 const Alerts = () => {
-  const [alerts, setAlerts] = useState(alertStore.getState().alerts);
+  const [alerts, setAlerts] = useState<AlertI[]>([]);
   const [openModal, setOpenModal] = useState(false);
-  const [selectedSeverity, setSelectedSeverity] = useState();
-  
+  const [selectedSeverity, setSelectedSeverity] = useState<AlertType>(
+    AlertType.Medium
+  );
+
   const [image, setImage] = useState<any | null>(null);
-  const [title, setTitle] = useState("");
-  const [type, setType] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
-    
+
   useEffect(() => {
+    const currentUserId = authStore.getState().user?.id;
+    if (!currentUserId) return;
+
+    alertStore
+      .getState()
+      .loadAlerts()
+      .then(() => {
+        const allAlerts = alertStore.getState().alerts;
+        setAlerts(allAlerts.filter((alert) => alert.userId === currentUserId));
+      });
+
     const unsub = alertStore.subscribe((state) => {
-      setAlerts(state.alerts);
+      setAlerts(state.alerts.filter((alert) => alert.userId === currentUserId));
     });
-    alertStore.getState().loadAlerts();
 
     return () => unsub();
   }, []);
@@ -63,15 +77,38 @@ const Alerts = () => {
     }
   };
 
+  const getLocation = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission denied");
+      return;
+    }
+
+    const loc = await Location.getCurrentPositionAsync({});
+    const coords = `${loc.coords.latitude.toFixed(
+      5
+    )}, ${loc.coords.longitude.toFixed(5)}`;
+    setLocation(coords);
+  };
+
   const handleAddAlert = () => {
-    // alertStore.getState().addAlert({
-    //   id: Date.now(),
-    //   type: AlertType.Medium,
-    //   title: "Test Alert",
-    //   description: "This is a mock alert",
-    //   time: Date.now(),
-    //   location: "Lisbon",
-    // });
+    const userId = authStore.getState().user?.id;
+    if (!userId) return;
+
+    alertStore.getState().addAlert({
+      userId,
+      type: selectedSeverity,
+      severity: selectedSeverity,
+      description,
+      location: location || "",
+      image: image,
+    });
+
+    setDescription("");
+    setLocation("");
+    setImage(null);
+    setSelectedSeverity(AlertType.Medium);
+    setOpenModal(false);
   };
 
   // if (alerts.length === 0) {
@@ -95,7 +132,6 @@ const Alerts = () => {
               key={alert.id}
               id={alert.id}
               type={alert.type}
-              title={alert.title}
               description={alert.description}
               time={alert.time}
               location={alert.location}
@@ -133,9 +169,28 @@ const Alerts = () => {
               padding: 20,
             }}
           >
-            <Text style={{ fontSize: 18, fontWeight: "600", marginBottom: 12 }}>
-              Add Alert
-            </Text>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Add Alert</Text>
+              <TouchableOpacity onPress={() => setOpenModal(false)}>
+                <AntDesign name="close-circle" size={26} color="darkgrey" />
+              </TouchableOpacity>
+            </View>
+
+            <View>
+              <Text style={{ marginBottom: 10 }}>GPS Location</Text>
+              <TextInput
+                placeholder="Location"
+                style={styles.location}
+                value={location}
+                onChangeText={(text) => setLocation(text)}
+              />
+              <Text
+                onPress={getLocation}
+                style={{ color: "lightblue", marginTop: 10 }}
+              >
+                Update Location
+              </Text>
+            </View>
 
             <Picker
               selectedValue={selectedSeverity}
@@ -151,38 +206,34 @@ const Alerts = () => {
             <TextInput
               placeholder="Describe what you see (size, location, details, nearby landmarks...)"
               style={styles.description}
+              multiline
+              numberOfLines={4}
+              value={description}
+              onChangeText={(text) => setDescription(text)}
             />
 
-            <TouchableOpacity style={styles.photoButton} onPress={pickImage}>
-              <Text style={styles.photoButtonText}>
-                {image ? "Change photo" : "Add photo"}
+            <View style={styles.warningBox}>
+              <Text style={styles.warningTopText}>Important!</Text>
+              <Text style={styles.warningDownText}>
+                Only report actual fires. False reports may delay emergency
+                response and put lives at risk.
               </Text>
-            </TouchableOpacity>
+            </View>
 
-            <TouchableOpacity
-              style={{
-                marginTop: 20,
-                backgroundColor: "#FF4500",
-                paddingVertical: 12,
-                borderRadius: 8,
-                alignItems: "center",
-              }}
-              onPress={pickImage}
-            >
-              <Text style={{ color: "#fff", fontWeight: "600" }}>Add</Text>
-            </TouchableOpacity>
+            <View style={styles.photoRow}>
+              <TouchableOpacity style={styles.photoButton} onPress={pickImage}>
+                <Text style={styles.photoButtonText}>Gallery</Text>
+              </TouchableOpacity>
 
+              <TouchableOpacity style={styles.photoButton} onPress={takePhoto}>
+                <Text style={styles.photoButtonText}>Camera</Text>
+              </TouchableOpacity>
+            </View>
             <TouchableOpacity
-              style={{
-                marginTop: 20,
-                backgroundColor: "#FF4500",
-                paddingVertical: 12,
-                borderRadius: 8,
-                alignItems: "center",
-              }}
-              onPress={takePhoto}
+              style={styles.submitButton}
+              onPress={handleAddAlert}
             >
-              <Text style={{ color: "#fff", fontWeight: "600" }}>Take</Text>
+              <Text style={styles.submitButtonText}>Submit Alert</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -194,33 +245,84 @@ const Alerts = () => {
 export default Alerts;
 
 const styles = StyleSheet.create({
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  photoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 16,
+  },
+  label: {},
+  photoButton: {
+    flex: 1,
+    backgroundColor: "#FF4500",
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginHorizontal: 6,
+  },
+  photoButtonText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+  location: {
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: "#ccc",
+    marginBottom: 8,
+    marginTop: 8,
+  },
   description: {
     borderWidth: 1,
     borderRadius: 8,
     borderColor: "#ccc",
-    marginBottom: 20,
     height: 120,
-    flex: 1,
-    flexDirection: "row",
-    textAlign: "left",
-  },
-  label: {},
-  photoButton: {
-    backgroundColor: "#555",
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
+    padding: 12,
+    textAlignVertical: "top",
     marginBottom: 16,
+    marginTop: 8,
   },
-  photoButtonText: {
-    color: "#fff",
+  warningBox: {
+    backgroundColor: "#fce6de",
+    borderColor: "#ffa787",
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    marginVertical: 6,
+  },
+  warningTopText: {
+    color: "#ed470a",
+    fontWeight: "600",
+    marginBottom: 12,
+  },
+  warningDownText: {
+    color: "#ed470a",
     fontWeight: "600",
   },
   severityPicker: {
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
-    paddingHorizontal: 12,
+    marginBottom: 16,
+    marginTop: 8,
+  },
+  submitButton: {
+    marginTop: 20,
+    backgroundColor: "#FF4500",
     paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  submitButtonText: {
+    color: "#fff",
+    fontWeight: "600",
   },
 });
