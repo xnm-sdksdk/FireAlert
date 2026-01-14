@@ -22,7 +22,7 @@ import authStore from "@/store/auth.store";
 import * as Location from "expo-location";
 
 const Alerts = () => {
-  const [alerts, setAlerts] = useState<AlertI[]>([]);
+  const [alerts, setAlerts] = useState(alertStore.getState().alerts);
   const [openModal, setOpenModal] = useState(false);
   const [selectedSeverity, setSelectedSeverity] = useState<AlertType>(
     AlertType.Medium
@@ -33,20 +33,10 @@ const Alerts = () => {
   const [location, setLocation] = useState("");
 
   useEffect(() => {
-    const currentUserId = authStore.getState().user?.id;
-    if (!currentUserId) return;
-
-    alertStore
-      .getState()
-      .loadAlerts()
-      .then(() => {
-        const allAlerts = alertStore.getState().alerts;
-        setAlerts(allAlerts.filter((alert) => alert.userId === currentUserId));
-      });
-
     const unsub = alertStore.subscribe((state) => {
-      setAlerts(state.alerts.filter((alert) => alert.userId === currentUserId));
+      setAlerts(state.alerts);
     });
+    alertStore.getState().loadAlerts();
 
     return () => unsub();
   }, []);
