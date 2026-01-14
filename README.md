@@ -1,4 +1,4 @@
-# Welcome to FireAlert 👋
+# Welcome to FireAlert
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
@@ -26,6 +26,54 @@ In the output, you'll find options to open the app in a
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+
+## Core Features
+
+- User authentication (register, sign in, profile update)
+
+- Create fire alerts with:
+
+      -severity
+
+      -description
+
+      -location (GPS)
+
+      -timestamp
+
+- View alerts as cards with clear attribution
+
+- Map view with:
+
+      - current user location
+
+      - alert markers
+
+      - zoom controls
+
+- Local persistence using AsyncStorage (no backend yet)
+
+- Clean state management using Zustand
+
+## Tech Stack:
+
+- Expo
+
+- React Native
+
+- TypeScript
+
+- Zustand for state management
+
+- AsyncStorage for local data persistence
+
+- expo-location
+
+- react-native-maps
+
+## Permissions:
+
+This app requires location permissions to function properly. Make sure to grant location access when prompted.
 
 ## Get a fresh project
 
