@@ -7,69 +7,53 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import authStore from "../../store/auth.store";
 
 const Profile = () => {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-  const submitData = (data: string) => {
-    console.log(data);
-  };
-  const editData = (data: string) => {
-    console.log(data);
-  };
-
-  const [username, onChangeText] = useState("");
-  const [password, onChangeNumber] = useState("");
-
   const store = useRef(authStore.getState()).current;
-  const { loadUser } = store;
+  const { user, updateUser, loadUser } = store;
+
+  const [username, setUsername] = useState(user?.username || "");
+  const [password, setPassword] = useState(user?.password || "");
+
+  const handleUpdate = async () => {
+    if (!username && !password) return;
+
+    const success = await updateUser(username, password);
+    if (success) {
+      Alert.alert("Profile updated successfully");
+      loadUser(); // refresh the store
+    } else {
+      Alert.alert("Failed to update profile");
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>
-        Welcome to your profile {store.user?.username}
+        Welcome to your profile {user?.username}
       </Text>
+
       <TextInput
         placeholder="Change Username"
         style={styles.input}
-        onChangeText={onChangeText}
-        value={store.user?.username}
+        value={username}
+        onChangeText={setUsername}
       />
       <TextInput
         placeholder="Change Password"
         style={styles.input}
-        onChangeText={onChangeNumber}
+        value={password}
+        onChangeText={setPassword}
         secureTextEntry
-        value={store.user?.password}
-      />
-      <Controller
-        control={control}
-        name="username"
-        render={({ field: { onChange, value } }) => (
-          <TextInput onChangeText={onChange} value={value} />
-        )}
       />
 
-      <SafeAreaView style={styles.buttonRow}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleSubmit(editData)}
-        >
-          <Text style={styles.buttonText}>Edit</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleSubmit(submitData)}
-        >
-          <Text style={styles.buttonText}>Submit</Text>
-        </TouchableOpacity>
-      </SafeAreaView>
+      <TouchableOpacity style={styles.button} onPress={handleUpdate}>
+        <Text style={styles.buttonText}>Update Profile</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -103,13 +87,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: "#f9f9f9",
   },
-  buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: -40,
-  },
   button: {
-    flex: 1,
     alignItems: "center",
     backgroundColor: "#FF4500",
     paddingVertical: 14,

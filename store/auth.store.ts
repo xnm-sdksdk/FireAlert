@@ -49,6 +49,34 @@ const authStore = create<AuthState>((set, get) => ({
         await AsyncStorage.removeItem("currentUser");
         router.replace("/auth");
     },
+    updateUser: async (
+        username?: string,
+        password?: string
+    ): Promise<boolean> => {
+        try {
+            const storedUsers = await AsyncStorage.getItem("users");
+            const currentUser = get().user;
+            if (!currentUser || !storedUsers) return false;
+
+            const users: User[] = JSON.parse(storedUsers);
+
+            if (username !== undefined) currentUser.username = username;
+            if (password !== undefined) currentUser.password = password;
+
+            const updatedUsers = users.map((u) =>
+                u.id === currentUser.id ? { ...u, ...currentUser } : u
+            );
+
+            await AsyncStorage.setItem("users", JSON.stringify(updatedUsers));
+            await AsyncStorage.setItem("currentUser", JSON.stringify(currentUser));
+
+            set({ user: currentUser, users: updatedUsers });
+            return true;
+        } catch (error) {
+            console.error("Failed to update user:", error);
+            return false;
+        }
+    },
 }));
 
 export default authStore;

@@ -11,4 +11,5 @@ export type AuthState = {
     signIn: (username: string, password: string) => Promise<boolean>;
     signOut: () => Promise<void>;
     loadUser: () => Promise<void>;
+    updateUser: (username: string, password: string) => Promise<boolean>;
 };
