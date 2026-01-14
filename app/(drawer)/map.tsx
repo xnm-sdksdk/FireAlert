@@ -1,5 +1,5 @@
 import MapView, { Marker } from "react-native-maps";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   PermissionsAndroid,
   View,
@@ -13,13 +13,59 @@ import Entypo from "@expo/vector-icons/Entypo";
 const Map = () => {
   const [mLat, setMLat] = useState(0);
   const [mLong, setMLong] = useState(0);
+  const MIN_ZOOM_LEVEL = 3;
+  const MAX_ZOOM_LEVEL = 20;
+  const [zoom, setZoom] = useState(15);
+  const [selectedRegion, setSelectedRegion] = useState({
+    latitude: 37.78825,
+    longitude: -122.4324,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
+  const mapRef = useRef<MapView>(null);
 
   useEffect(() => {
     requestLocationPermission();
   }, []);
 
-  const [zoom, setZoom] = useState(15);
-  const handleView = (isZoomIn = false) => {};
+  const handleView = (zoomIn = false) => {
+    let newZoom = zoom;
+
+    if (zoomIn && zoom > MIN_ZOOM_LEVEL) {
+      newZoom--;
+    } else if (!zoomIn && zoom < MAX_ZOOM_LEVEL) {
+      newZoom++;
+    } else {
+      return;
+    }
+
+    const [longitudeDelta, latitudeDelta] = getLatLongDelta(
+      newZoom,
+      selectedRegion.latitude
+    );
+
+    const newRegion = {
+      ...selectedRegion,
+      latitudeDelta,
+      longitudeDelta,
+    };
+
+    setZoom(newZoom);
+    setSelectedRegion(newRegion);
+    if (mapRef.current) {
+      mapRef.current.animateToRegion(newRegion, 250);
+    }
+  };
+
+  const getLatLongDelta = (
+    zoom: number,
+    latitude: number
+  ): [number, number] => {
+    const longitudeDelta = 360 / Math.pow(2, zoom);
+    const latitudeDelta =
+      longitudeDelta * (1 / Math.cos((latitude * Math.PI) / 180));
+    return [longitudeDelta, latitudeDelta];
+  };
 
   const requestLocationPermission = async () => {
     try {
@@ -60,26 +106,58 @@ const Map = () => {
     }
 
     const loc = await Location.getCurrentPositionAsync({});
-    setMLat(loc.coords.latitude);
-    setMLong(loc.coords.longitude);
+    const { latitude, longitude } = loc.coords;
+
+    setMLat(latitude);
+    setMLong(longitude);
+
+    const region = {
+      latitude,
+      longitude,
+      latitudeDelta: selectedRegion.latitudeDelta,
+      longitudeDelta: selectedRegion.longitudeDelta,
+    };
+
+    setSelectedRegion(region);
+
+    if (mapRef.current) {
+      mapRef.current.animateToRegion(region, 500);
+    }
   };
 
   return (
     <View style={{ flex: 1 }}>
-      <MapView style={{ flex: 1 }} mapType="hybrid">
+      <MapView
+        ref={mapRef}
+        style={{ flex: 1 }}
+        mapType="hybrid"
+        initialRegion={selectedRegion}
+      >
         <Marker coordinate={{ latitude: mLat, longitude: mLong }} />
       </MapView>
 
       <TouchableOpacity
-        style={{ position: "absolute", bottom: 100, left: 20 }}
-        onPress={() => handleView(true)}
+        style={{
+          position: "absolute",
+          bottom: 100,
+          left: 20,
+          opacity: zoom === MAX_ZOOM_LEVEL ? 0.2 : 1,
+        }}
+        onPress={() => handleView(false)}
+        disabled={zoom === MAX_ZOOM_LEVEL}
       >
         <MaterialIcons name="add-box" size={32} color="lightgrey" />
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={{ position: "absolute", bottom: 65, left: 20 }}
+        style={{
+          position: "absolute",
+          bottom: 65,
+          left: 20,
+          opacity: zoom === MIN_ZOOM_LEVEL ? 0.2 : 1,
+        }}
         onPress={() => handleView(true)}
+        disabled={zoom === MIN_ZOOM_LEVEL}
       >
         <Entypo name="squared-minus" size={32} color="lightgrey" />
       </TouchableOpacity>
