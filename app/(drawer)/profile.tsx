@@ -1,7 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
 import {
-  Button,
   TextInput,
   View,
   StyleSheet,
@@ -9,7 +7,6 @@ import {
   Text,
   Alert,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import authStore from "../../store/auth.store";
 
 const Profile = () => {
@@ -25,7 +22,7 @@ const Profile = () => {
     const success = await updateUser(username, password);
     if (success) {
       Alert.alert("Profile updated successfully");
-      loadUser(); // refresh the store
+      loadUser();
     } else {
       Alert.alert("Failed to update profile");
     }

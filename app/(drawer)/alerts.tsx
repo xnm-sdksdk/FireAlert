@@ -1,7 +1,7 @@
 import Card from "@/components/ui/Card";
 import { AlertType, AlertI } from "@/constants/alertType";
 import alertStore from "@/store/alert.store";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   TouchableOpacity,
