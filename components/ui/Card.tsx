@@ -3,7 +3,6 @@ import React, { useRef } from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import alertStore from "../../store/alert.store";
-import authStore from "@/store/auth.store";
 
 export default function Card({
   id,
@@ -17,9 +16,6 @@ export default function Card({
   const store = useRef(alertStore.getState()).current;
   const { removeAlert } = store;
 
-  const userStore = useRef(authStore.getState()).current;
-  const { user } = userStore;
-
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -31,7 +27,6 @@ export default function Card({
           onPress={() => removeAlert(id)}
         />
       </View>
-      <Text style={styles.creator}>{user?.username}</Text>
       <Text style={styles.description}>{description || "No description"}</Text>
       <Text style={styles.time}>{time.toString().slice(0, 25)}</Text>
       <Text style={styles.location}>{location}</Text>
