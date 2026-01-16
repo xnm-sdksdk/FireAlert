@@ -21,10 +21,10 @@ const Profile = () => {
 
     const success = await updateUser(username, password);
     if (success) {
-      Alert.alert("Profile updated successfully");
+      Alert.alert("Success", "Profile updated successfully");
       loadUser();
     } else {
-      Alert.alert("Failed to update profile");
+      Alert.alert("Error","Failed to update profile");
     }
   };
 

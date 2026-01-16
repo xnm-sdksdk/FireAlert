@@ -101,7 +101,7 @@ const Map = () => {
   const getLocation = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Permission denied");
+      Alert.alert("Error", "Permission denied, location was not granted.");
       return;
     }
 

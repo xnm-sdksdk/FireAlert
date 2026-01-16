@@ -1,6 +1,12 @@
-import { AlertI, AlertsState, AlertType, NewAlert } from "@/constants/alertType";
+import { AlertI, AlertsState, NewAlert } from "@/constants/alertType";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
+import { useRef } from "react";
+import authStore from "./auth.store";
+import { Alert } from "react-native";
+
+const userStore = useRef(authStore.getState()).current;
+const { user } = userStore;
 
 const alertStore = create<AlertsState>((set, get) => ({
     alert: null,
@@ -20,6 +26,18 @@ const alertStore = create<AlertsState>((set, get) => ({
     },
 
     removeAlert: async (id: number) => {
+        const alertToRemove = get().alerts.find((alert) => alert.id === id);
+
+        if (!alertToRemove) {
+            Alert.alert("Error", "Alert not found.");
+            return;
+        }
+
+        if (alertToRemove.userId !== userStore.user?.id) {
+            Alert.alert("Error", "Alerts can only be deleted by the creator.");
+            return;
+        }
+
         const updated = get().alerts.filter((alert) => alert.id !== id);
         set({ alerts: updated });
         await AsyncStorage.setItem("alerts", JSON.stringify(updated));
